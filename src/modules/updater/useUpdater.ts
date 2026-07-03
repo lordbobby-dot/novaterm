@@ -1,8 +1,7 @@
 import { getVersion } from "@tauri-apps/api/app";
-import { relaunch } from "@tauri-apps/plugin-process";
-import { check, type Update } from "@tauri-apps/plugin-updater";
+
+
 import { useCallback, useEffect, useState } from "react";
-import { IS_LINUX } from "@/lib/platform";
 
 const LAST_CHECK_KEY = "novaterm:updater:last-check";
 const CHECK_INTERVAL_MS = 30 * 60 * 1000;
@@ -20,7 +19,7 @@ export type UpdaterStatus =
   | { kind: "idle" }
   | { kind: "checking" }
   | { kind: "uptodate" }
-  | { kind: "available"; update: Update }
+
   | { kind: "manual-available"; info: ManualUpdateInfo }
   | { kind: "downloading"; downloaded: number; contentLength: number | null }
   | { kind: "ready" }
@@ -46,7 +45,7 @@ function isNewer(remote: string, current: string): boolean {
   return false;
 }
 
-async function checkLinuxRelease(): Promise<ManualUpdateInfo | null> {
+async function checkGitHubRelease(): Promise<ManualUpdateInfo | null> {
   const [current, res] = await Promise.all([
     getVersion(),
     fetch(GITHUB_LATEST_RELEASE, {
@@ -91,19 +90,9 @@ export function useUpdater({ autoCheck = true }: HookOptions = {}) {
     }
     setStatus({ kind: "checking" });
     try {
-      if (IS_LINUX) {
-        const info = await checkLinuxRelease();
-        if (info) {
-          setStatus({ kind: "manual-available", info });
-        } else {
-          localStorage.setItem(LAST_CHECK_KEY, String(Date.now()));
-          setStatus({ kind: "uptodate" });
-        }
-        return;
-      }
-      const update = await check();
-      if (update) {
-        setStatus({ kind: "available", update });
+      const info = await checkGitHubRelease();
+      if (info) {
+        setStatus({ kind: "manual-available", info });
       } else {
         localStorage.setItem(LAST_CHECK_KEY, String(Date.now()));
         setStatus({ kind: "uptodate" });
@@ -114,31 +103,7 @@ export function useUpdater({ autoCheck = true }: HookOptions = {}) {
   }, []);
 
   const install = useCallback(async () => {
-    if (status.kind !== "available") return;
-    const { update } = status;
-    let total: number | null = null;
-    let downloaded = 0;
-    setStatus({ kind: "downloading", downloaded: 0, contentLength: null });
-    try {
-      await update.downloadAndInstall((event) => {
-        if (event.event === "Started") {
-          total = event.data.contentLength ?? null;
-          setStatus({
-            kind: "downloading",
-            downloaded: 0,
-            contentLength: total,
-          });
-        } else if (event.event === "Progress") {
-          downloaded += event.data.chunkLength;
-          setStatus({ kind: "downloading", downloaded, contentLength: total });
-        } else if (event.event === "Finished") {
-          setStatus({ kind: "ready" });
-        }
-      });
-      await relaunch();
-    } catch (err) {
-      setStatus({ kind: "error", message: String(err) });
-    }
+    // Legacy auto-install removed since we use manual-available for all platforms
   }, [status]);
 
   const dismiss = useCallback(() => {
