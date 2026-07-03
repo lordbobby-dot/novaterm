@@ -93,6 +93,13 @@ The themes below frame every scope decision.
 
 ## Planned
 
+### Next-Generation Upgrades (v2)
+
+- [ ] **Local Codebase Knowledge Base (RAG):** Embed a local vector database (like SQLite with `sqlite-vss`) in the Rust backend to let the AI instantly search and query the entire codebase context without cloud data-leaks.
+- [ ] **Block-Based Interactive Terminal:** Parse command outputs (like `npm run dev` or `docker ps`) and render them as interactive, clickable React blocks directly inside the terminal scrollback.
+- [ ] **Inline Command Autocomplete:** Ghost-text bash command prediction using lightweight local LLM endpoints (similar to Warp).
+- [ ] **Visual Git Conflict Resolution:** Dedicated side-by-side interactive diff UI with an "AI Resolve" button for seamless merges.
+
 ### Coming next
 
 - [ ] SSH support (PTY auth and known_hosts first; SFTP and port forwarding later)
