@@ -95,7 +95,7 @@ export function AiMiniWindow({ state }: { state: PresenceState }) {
       data-ai-mini-window
       className={cn(
         "no-scrollbar-deep fixed z-40 flex flex-col overflow-hidden",
-        "rounded-2xl border border-border/60 bg-card text-[12px]",
+        "rounded-2xl border border-border/60 text-[12px] glass-panel glow-hover",
         "shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset,0_24px_48px_-12px_rgba(0,0,0,0.45),0_8px_16px_-8px_rgba(0,0,0,0.3)]",
         "ring-1 ring-black/5 dark:ring-white/5",
         "duration-200 ease-out",

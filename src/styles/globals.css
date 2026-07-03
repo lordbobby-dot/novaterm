@@ -448,6 +448,30 @@ html *::-webkit-scrollbar {
   animation: novaterm-shimmer var(--shimmer-duration, 2s) linear infinite;
 }
 
+/* --- Premium Glassmorphism & Glow Utilities --- */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-panel {
+  background: rgba(10, 10, 10, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.glow-hover {
+  transition: box-shadow var(--dur-base) var(--ease-premium), border-color var(--dur-base) var(--ease-premium);
+}
+.glow-hover:hover {
+  box-shadow: 0 0 15px 0px rgba(168, 85, 247, 0.35); /* Subtle purple/magenta glow */
+  border-color: rgba(168, 85, 247, 0.5);
+}
+/* ----------------------------------------------- */
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-fast: 0.01ms;
