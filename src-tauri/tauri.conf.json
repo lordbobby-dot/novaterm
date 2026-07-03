@@ -82,8 +82,10 @@
         "installerHooks": "./installer-hooks.nsh"
       }
     },
-    "category": "DeveloperTool",
     "shortDescription": "AI-native terminal emulator",
     "longDescription": "NovaTerm — an open-source AI-native terminal emulator with multi-tab, file explorer, code editor, web preview, voice input, and AI agents."
+  },
+  "plugins": {
+    "updater": {}
   }
 }
