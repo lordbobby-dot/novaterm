@@ -66,15 +66,13 @@ export default function ShellInput({
 
   const fontFamilyPref = usePreferencesStore((p) => p.terminalFontFamily);
   const fontSize = usePreferencesStore((p) => p.terminalFontSize);
-  const prefs = usePreferencesStore((s) => ({
-    enabled: s.autocompleteEnabled,
-    provider: s.autocompleteProvider,
-    modelId: s.autocompleteModelId,
-    lmstudioBaseURL: s.lmstudioBaseURL,
-    mlxBaseURL: s.mlxBaseURL,
-    ollamaBaseURL: s.ollamaBaseURL,
-    openaiCompatibleBaseURL: s.openaiCompatibleBaseURL,
-  }));
+  const autocompleteEnabled = usePreferencesStore((p) => p.autocompleteEnabled);
+  const autocompleteProvider = usePreferencesStore((p) => p.autocompleteProvider);
+  const autocompleteModelId = usePreferencesStore((p) => p.autocompleteModelId);
+  const lmstudioBaseURL = usePreferencesStore((p) => p.lmstudioBaseURL);
+  const mlxBaseURL = usePreferencesStore((p) => p.mlxBaseURL);
+  const ollamaBaseURL = usePreferencesStore((p) => p.ollamaBaseURL);
+  const openaiCompatibleBaseURL = usePreferencesStore((p) => p.openaiCompatibleBaseURL);
   const fontFamily = resolveFontFamily(fontFamilyPref);
   const fontRef = useRef({ fontFamily, fontSize });
   fontRef.current = { fontFamily, fontSize };
@@ -97,7 +95,7 @@ export default function ShellInput({
         const local = await historySuggest(line);
         if (local) return local;
 
-        if (!prefs.enabled) return null;
+        if (!autocompleteEnabled) return null;
 
         if (inflightRef.current) {
           inflightRef.current.abort();
@@ -109,8 +107,16 @@ export default function ShellInput({
           await new Promise((r) => setTimeout(r, 200));
           if (ac.signal.aborted) return null;
 
-          const apiKey = await getKey(prefs.provider);
-          const deps = { ...prefs, apiKey };
+          const apiKey = await getKey(autocompleteProvider);
+          const deps = { 
+            provider: autocompleteProvider,
+            modelId: autocompleteModelId,
+            lmstudioBaseURL,
+            mlxBaseURL,
+            ollamaBaseURL,
+            openaiCompatibleBaseURL,
+            apiKey
+          };
 
           const req = {
             prefix: line,
