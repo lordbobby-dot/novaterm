@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 const LAST_CHECK_KEY = "novaterm:updater:last-check";
 const CHECK_INTERVAL_MS = 30 * 60 * 1000;
 const GITHUB_LATEST_RELEASE =
-  "https://api.github.com/repos/my-org/novaterm-ai/releases/latest";
+  "https://api.github.com/repos/lordbobby-dot/novaterm/releases/latest";
 
 export interface ManualUpdateInfo {
   version: string;
