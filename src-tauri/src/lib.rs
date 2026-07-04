@@ -135,7 +135,6 @@ pub fn run() {
     let builder = builder.plugin(tauri_plugin_clipboard_manager::init());
     builder
         .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         // Skip restoring VISIBLE — frontend calls window.show() after first
         // paint so the user never sees a transparent window-shadow flash on
         // Windows/Linux.
@@ -155,6 +154,15 @@ pub fn run() {
         )
         .plugin(tauri_plugin_opener::init())
         .setup(|_app| {
+            #[cfg(target_os = "macos")]
+            if let Some(main) = _app.get_webview_window("main") {
+                let _ = window_vibrancy::apply_vibrancy(&main, window_vibrancy::NSVisualEffectMaterial::HudWindow, None, None);
+            }
+            #[cfg(target_os = "windows")]
+            if let Some(main) = _app.get_webview_window("main") {
+                let _ = window_vibrancy::apply_acrylic(&main, Some((18, 18, 18, 125)));
+            }
+
             // macOS skips parent() for the settings window, so tie its lifecycle
             // to the main window here instead. Other platforms keep parent().
             #[cfg(target_os = "macos")]

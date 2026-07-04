@@ -11,6 +11,7 @@
     "removeUnusedCommands": true
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "NovaTerm",
@@ -21,7 +22,8 @@
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "visible": true,
-        "dragDropEnabled": true
+        "dragDropEnabled": true,
+        "transparent": true
       }
     ],
     "security": {
@@ -84,8 +86,5 @@
     },
     "shortDescription": "AI-native terminal emulator",
     "longDescription": "NovaTerm — an open-source AI-native terminal emulator with multi-tab, file explorer, code editor, web preview, voice input, and AI agents."
-  },
-  "plugins": {
-    "updater": {}
   }
 }

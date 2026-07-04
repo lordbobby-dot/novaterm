@@ -17,6 +17,8 @@ import {
   historyRecord,
   historySuggest,
 } from "./lib/history";
+import { getKey } from "@/modules/ai/lib/keyring";
+import { requestCompletion } from "@/modules/editor/lib/autocomplete/provider";
 import type { BlockMode } from "./lib/modeMachine";
 import { createShellEditor, type ShellEditorHandle } from "./lib/shellEditor";
 
@@ -64,9 +66,19 @@ export default function ShellInput({
 
   const fontFamilyPref = usePreferencesStore((p) => p.terminalFontFamily);
   const fontSize = usePreferencesStore((p) => p.terminalFontSize);
+  const prefs = usePreferencesStore((s) => ({
+    enabled: s.autocompleteEnabled,
+    provider: s.autocompleteProvider,
+    modelId: s.autocompleteModelId,
+    lmstudioBaseURL: s.lmstudioBaseURL,
+    mlxBaseURL: s.mlxBaseURL,
+    ollamaBaseURL: s.ollamaBaseURL,
+    openaiCompatibleBaseURL: s.openaiCompatibleBaseURL,
+  }));
   const fontFamily = resolveFontFamily(fontFamilyPref);
   const fontRef = useRef({ fontFamily, fontSize });
   fontRef.current = { fontFamily, fontSize };
+  const inflightRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -80,7 +92,40 @@ export default function ShellInput({
       getCwd: () => cbRef.current.getCwd(),
       onChange: (text) =>
         setLeafInputActivity(leafIdRef.current, text.length > 0),
-      suggest: historySuggest,
+      suggest: async (line) => {
+        if (!line.trim()) return null;
+        const local = await historySuggest(line);
+        if (local) return local;
+
+        if (!prefs.enabled) return null;
+
+        if (inflightRef.current) {
+          inflightRef.current.abort();
+        }
+        const ac = new AbortController();
+        inflightRef.current = ac;
+
+        try {
+          await new Promise((r) => setTimeout(r, 200));
+          if (ac.signal.aborted) return null;
+
+          const apiKey = await getKey(prefs.provider);
+          const deps = { ...prefs, apiKey };
+
+          const req = {
+            prefix: line,
+            suffix: "",
+            filename: null,
+            language: "shell",
+          };
+
+          const res = await requestCompletion(req, deps, ac.signal);
+          if (ac.signal.aborted) return null;
+          return res ? line + res : null;
+        } catch {
+          return null;
+        }
+      },
       historyList,
       onSubmit: (text) => {
         historyRecord(text);
